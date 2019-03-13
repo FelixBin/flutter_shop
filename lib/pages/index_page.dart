@@ -24,7 +24,7 @@ class _IndexPageState extends State<IndexPage> {
         icon: Icon(CupertinoIcons.profile_circled), title: Text('会员中心')),
   ];
 
-//底部导航匹配页面--按钮对应的页面
+//底部导航匹配页面---按钮对应的页面
   final List tabBodies = [HomePage(), CategoryPage(), CartPage(), MemberPage()];
 
   int currentIndex = 0;
@@ -44,7 +44,7 @@ class _IndexPageState extends State<IndexPage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         items: bottomTabs,
-        onTap: (index) {
+        onTap: (index) {//切换
           setState(() {
             //动态组件改变里面样式需要使用setState
             currentIndex = index;

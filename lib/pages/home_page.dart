@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
+import '../service/service_method.dart';
 
-class HomePage extends StatelessWidget {
-  final Widget child;
+class HomePage extends StatefulWidget {
+  _HomePageState createState() => _HomePageState();
+}
 
-  HomePage({Key key, this.child}) : super(key: key);
+class _HomePageState extends State<HomePage> {
+  String homePageContent = "正在获取数据";
+  @override
+  void initState() {
+    getHomePageContent().then((val) {
+      setState(() {
+        homePageContent = val.toString();
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Center(child: Text('首页'),),
+      appBar: AppBar(title: Text('百姓生活+')),
+      body: SingleChildScrollView(
+        child: Text(homePageContent),
       ),
     );
   }
