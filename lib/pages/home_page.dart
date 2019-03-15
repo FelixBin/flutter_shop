@@ -14,18 +14,22 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         appBar: AppBar(title: Text('百姓生活+')),
         body: FutureBuilder(
-          future: getHomePageContent(),
+          future: getHomePageContent(), //调用接口方法
           builder: (context, snapshot) {
+            //数据处理
             if (snapshot.hasData) {
               var data = json.decode(snapshot.data.toString());
               List<Map> swiperDataList =
                   (data['data']['slides'] as List).cast();
               List<Map> navigatorList =
                   (data['data']['category'] as List).cast(); //类别列表
+              String advertesPicture =
+                  data['data']['advertesPicture']['PICTURE_ADDRESS'];
               return Column(
                 children: <Widget>[
                   SwiperDiy(swiperDataList: swiperDataList),
                   TopNavigator(navigatorList: navigatorList), //导航组件
+                  AdBanner(advertesPicture: advertesPicture), //广告组件
                 ],
               );
             } else {
@@ -73,10 +77,11 @@ class TopNavigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (navigatorList.length > 0) {
-      navigatorList.removeRange(10, navigatorList.length);// navigatorList.removeLast();
+      navigatorList.removeRange(
+          10, navigatorList.length); // navigatorList.removeLast();
     }
     return Container(
-      height: ScreenUtil().setHeight(320),
+      height: ScreenUtil().setHeight(350),
       padding: const EdgeInsets.all(3.0),
       child: GridView.count(
         crossAxisCount: 5,
@@ -104,6 +109,20 @@ class TopNavigator extends StatelessWidget {
           Text(item['mallCategoryName'])
         ],
       ),
+    );
+  }
+}
+
+//广告图片
+
+class AdBanner extends StatelessWidget {
+  final String advertesPicture;
+  AdBanner({Key key, this.advertesPicture}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Image.network(advertesPicture),
     );
   }
 }
