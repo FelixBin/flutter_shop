@@ -31,6 +31,9 @@ class _HomePageState extends State<HomePage> {
                   data['data']['shopInfo']['leaderImage']; //店长图片
               String leaderPhone =
                   data['data']['shopInfo']['leaderPhone']; //店长电话
+
+              List<Map> recommendList =
+                  (data['data']['recommend'] as List).cast(); // 商品推荐
               return SingleChildScrollView(
                   child: Column(
                 children: <Widget>[
@@ -40,6 +43,7 @@ class _HomePageState extends State<HomePage> {
                   LeaderPhone(
                       leaderImage: leaderImage,
                       leaderPhone: leaderPhone), //广告组件
+                  Recommend(recommendList: recommendList) // 商品推荐
                 ],
               ));
             } else {
@@ -137,7 +141,6 @@ class AdBanner extends StatelessWidget {
 }
 
 //店长电话
-
 class LeaderPhone extends StatelessWidget {
   final String leaderImage; //店长图片
   final String leaderPhone; //店长电话
@@ -148,7 +151,7 @@ class LeaderPhone extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: InkWell(
-        onTap:_launchURL,
+        onTap: _launchURL,
         child: Image.network(leaderImage),
       ),
     );
@@ -161,5 +164,79 @@ class LeaderPhone extends StatelessWidget {
     } else {
       print('url不能访问，异常!');
     }
+  }
+}
+
+//推荐商品类的编写
+class Recommend extends StatelessWidget {
+  final List recommendList;
+  Recommend({Key key, this.recommendList}) : super(key: key);
+
+  //4.在build方法里进行组合
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: ScreenUtil().setHeight(468),
+      margin: EdgeInsets.only(top: 10.0),
+      child: Column(
+        children: <Widget>[_titleWidget(), _recommedList()],
+      ),
+    );
+  }
+
+//1.推荐商品标题
+  Widget _titleWidget() {
+    return Container(
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.fromLTRB(10.0, 2.0, 0, 5.0),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border:
+                Border(bottom: BorderSide(width: 1, color: Colors.black12))),
+        child: Text('商品推荐', style: TextStyle(color: Colors.pink)));
+  }
+
+  //2.列表组件的编写
+  Widget _recommedList() {
+    return Container(
+      height: ScreenUtil().setHeight(400),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: recommendList.length,
+        itemBuilder: (context, index) {
+          return _item(index);
+        },
+      ),
+    );
+  }
+
+  //3.推荐商品单独项编写
+  Widget _item(index) {
+    return InkWell(
+      onTap: () {},
+      child: Container(
+        height: ScreenUtil().setHeight(330),
+        width: ScreenUtil().setWidth(250),
+        padding: EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(
+                left: BorderSide(
+                    width: 1,
+                    color: Colors.black12,
+                    style: BorderStyle.solid))),
+        child: Column(
+          children: <Widget>[
+            Image.network(recommendList[index]['image'], fit: BoxFit.cover),
+            Text('￥${recommendList[index]['mallPrice']}'),
+            Text(
+              '￥${recommendList[index]['price']}',
+              style: TextStyle(
+                  decoration: TextDecoration.lineThrough, color: Colors.grey),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
