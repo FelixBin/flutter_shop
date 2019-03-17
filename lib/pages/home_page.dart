@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   @override
-  bool get wantKeepAlive =>true;
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -43,6 +43,18 @@ class _HomePageState extends State<HomePage>
 
               List<Map> recommendList =
                   (data['data']['recommend'] as List).cast(); // 商品推荐
+              String floor1Title =
+                  data['data']['floor1Pic']['PICTURE_ADDRESS']; //楼层1的标题图片
+              String floor2Title =
+                  data['data']['floor2Pic']['PICTURE_ADDRESS']; //楼层1的标题图片
+              String floor3Title =
+                  data['data']['floor3Pic']['PICTURE_ADDRESS']; //楼层1的标题图片
+              List<Map> floor1 =
+                  (data['data']['floor1'] as List).cast(); //楼层1商品和图片
+              List<Map> floor2 =
+                  (data['data']['floor2'] as List).cast(); //楼层1商品和图片
+              List<Map> floor3 =
+                  (data['data']['floor3'] as List).cast(); //楼层1商品和图片
               return SingleChildScrollView(
                   child: Column(
                 children: <Widget>[
@@ -52,7 +64,13 @@ class _HomePageState extends State<HomePage>
                   LeaderPhone(
                       leaderImage: leaderImage,
                       leaderPhone: leaderPhone), //广告组件
-                  Recommend(recommendList: recommendList) // 商品推荐
+                  Recommend(recommendList: recommendList), // 商品推荐
+                  FloorTitle(picture_address: floor1Title),
+                  FloorContent(floorGoodsList: floor1),
+                  FloorTitle(picture_address: floor2Title),
+                  FloorContent(floorGoodsList: floor2),
+                  FloorTitle(picture_address: floor3Title),
+                  FloorContent(floorGoodsList: floor3),
                 ],
               ));
             } else {
@@ -245,6 +263,72 @@ class Recommend extends StatelessWidget {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+//首页_楼层区域的编写
+
+//1.编写楼层标题组件
+class FloorTitle extends StatelessWidget {
+  final String picture_address;
+  FloorTitle({Key key, this.picture_address}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      child: Image.network(picture_address),
+    );
+  }
+}
+
+//楼层商品组件的编写
+class FloorContent extends StatelessWidget {
+  final List floorGoodsList;
+  FloorContent({Key key, this.floorGoodsList}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: <Widget>[_firstRow(), _otherGoods()],
+      ),
+    );
+  }
+
+//第一块
+  Widget _firstRow() {
+    return Row(
+      children: <Widget>[
+        _goodsItem(floorGoodsList[0]),
+        Column(
+          children: <Widget>[
+            _goodsItem(floorGoodsList[1]),
+            _goodsItem(floorGoodsList[2]),
+          ],
+        )
+      ],
+    );
+  }
+
+////第二块
+  Widget _otherGoods() {
+    return Row(
+      children: <Widget>[
+        _goodsItem(floorGoodsList[3]),
+        _goodsItem(floorGoodsList[4]),
+      ],
+    );
+  }
+
+  //商品的子项，也算是这个类的最小模块了
+  Widget _goodsItem(Map goods_item) {
+    return Container(
+      width: ScreenUtil().setWidth(375),
+      child: InkWell(
+        onTap: () {},
+        child: Image.network(goods_item['image']),
       ),
     );
   }
