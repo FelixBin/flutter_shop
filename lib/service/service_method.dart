@@ -5,7 +5,7 @@ import '../config/service_url.dart';
 
 
 //通用接口
-Future request(url,formData)async{
+Future request(url,{formData})async{
     try{
       print('开始获取数据...............');
       Response response;
