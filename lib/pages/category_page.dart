@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../service/service_method.dart';
 import 'dart:convert';
 import '../model/category.dart';
+import '../model/categoryGoodsList.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart'; //屏幕适配
 
 import 'package:provide/provide.dart';
@@ -24,7 +26,7 @@ class _CategoryPageState extends State<CategoryPage> {
           children: <Widget>[
             LeftCategoryNav(),
             Column(
-              children: <Widget>[RightCategoryNav()],
+              children: <Widget>[RightCategoryNav(), CategoryGoodsList()],
             )
           ],
         ),
@@ -150,5 +152,111 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
         ),
       ),
     );
+  }
+}
+
+//商品列表，可以上拉加载
+class CategoryGoodsList extends StatefulWidget {
+  @override
+  _CategoryGoodsListState createState() => _CategoryGoodsListState();
+}
+
+class _CategoryGoodsListState extends State<CategoryGoodsList> {
+  List list = [];
+  @override
+  void initState() {
+    _getGoodList();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: ScreenUtil().setWidth(570),
+      height: ScreenUtil().setHeight(900),
+      child: ListView.builder(
+        itemCount: list.length,
+        itemBuilder: (context, index) {
+          return _ListWidget(index);
+        },
+      ),
+    );
+  }
+
+//商品图片方法编写
+  Widget _goodsImage(index) {
+    return Container(
+      width: ScreenUtil().setWidth(200),
+      child: Image.network(list[index].image),
+    );
+  }
+
+//商品名称方法编写
+  Widget _goodsName(index) {
+    return Container(
+      padding: EdgeInsets.all(5.0),
+      width: ScreenUtil().setWidth(370),
+      child: Text(
+        list[index].goodsName,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: ScreenUtil().setSp(28)),
+      ),
+    );
+  }
+
+  //商品价格方法编写
+  Widget _goodsPrice(index) {
+    return Container(
+      margin: EdgeInsets.only(top: 20.0),
+      width: ScreenUtil().setWidth(370),
+      child: Row(
+        children: <Widget>[
+          Text(
+            '价格￥${list[index].presentPrice}',
+            style:
+                TextStyle(color: Colors.pink, fontSize: ScreenUtil().setSp(28)),
+          ),
+          Text(
+            '￥${list[index].oriPrice}',
+            style: TextStyle(
+                color: Colors.black26, decoration: TextDecoration.lineThrough),
+          ),
+        ],
+      ),
+    );
+  }
+
+  //把方法进行组合
+  Widget _ListWidget(int index) {
+    return InkWell(
+        onTap: () {},
+        child: Container(
+          padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                  bottom: BorderSide(width: 1.0, color: Colors.black12))),
+          child: Row(
+            children: <Widget>[
+              _goodsImage(index),
+              Column(
+                children: <Widget>[_goodsName(index), _goodsPrice(index)],
+              )
+            ],
+          ),
+        ));
+  }
+
+  void _getGoodList() async {
+    var data = {'categoryId': '4', 'categorySubId': "", 'page': 1};
+    await request('getMallGoods', formData: data).then((val) {
+      var data = json.decode(val.toString());
+      CategoryGoodsListModel goodsList =
+          new CategoryGoodsListModel.fromJson(data);
+      setState(() {
+        list = goodsList.data;
+      });
+    });
   }
 }
