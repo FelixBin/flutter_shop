@@ -80,7 +80,8 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         });
         var childList = list[index].bxMallSubDto;
         var categoryId = list[index].mallCategoryId;
-        Provide.value<ChildCategory>(context).getChildCategory(childList);
+        Provide.value<ChildCategory>(context)
+            .getChildCategory(childList, categoryId);
         _getGoodList(categoryId: categoryId);
       },
       child: Container(
@@ -108,7 +109,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         list = category.data;
       });
       Provide.value<ChildCategory>(context)
-          .getChildCategory(list[0].bxMallSubDto);
+          .getChildCategory(list[0].bxMallSubDto, list[0].mallCategoryId);
     });
   }
 
@@ -168,7 +169,9 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
         : false;
     return InkWell(
       onTap: () {
-        Provide.value<ChildCategory>(context).changeChildIndex(index);
+        Provide.value<ChildCategory>(context)
+            .changeChildIndex(index, item.mallSubId);
+        _getGoodList(item.mallSubId);
       },
       child: Container(
         padding: EdgeInsets.fromLTRB(5.0, 5.0, 10.0, 10.0),
@@ -180,6 +183,26 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
         ),
       ),
     );
+  }
+
+//categorySubId 子类id
+  void _getGoodList(String categorySubId) async {
+    var data = {
+      'categoryId': Provide.value<ChildCategory>(context).categoryId,
+      'categorySubId': categorySubId,
+      'page': 1
+    };
+    await request('getMallGoods', formData: data).then((val) {
+      var data = json.decode(val.toString());
+      CategoryGoodsListModel goodsList =
+          new CategoryGoodsListModel.fromJson(data);
+      if (goodsList.data == null) {
+        Provide.value<CategoryGoodsListProvide>(context).getGoodsList([]);
+      } else {
+        Provide.value<CategoryGoodsListProvide>(context)
+            .getGoodsList(goodsList.data);
+      }
+    });
   }
 }
 
@@ -199,17 +222,27 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   Widget build(BuildContext context) {
     return Provide<CategoryGoodsListProvide>(
       builder: (context, child, data) {
-        return Expanded(
-          child: Container(
-            width: ScreenUtil().setWidth(570),
-            child: ListView.builder(
-              itemCount: data.goodsList.length,
-              itemBuilder: (context, index) {
-                return _ListWidget(data.goodsList, index);
-              },
+        if (data.goodsList.length > 0) {
+          return Expanded(
+            child: Container(
+              width: ScreenUtil().setWidth(570),
+              child: ListView.builder(
+                itemCount: data.goodsList.length,
+                itemBuilder: (context, index) {
+                  return _ListWidget(data.goodsList, index);
+                },
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          return Container(
+            margin: EdgeInsets.only(top: 10),
+            child: Text(
+              '暂时没有数据哦~',
+              style: TextStyle(color: Colors.black26),
+            ),
+          );
+        }
       },
     );
   }
