@@ -9,6 +9,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart'; //屏幕适配
 import 'package:provide/provide.dart';
 import '../provide/child_category.dart';
 import '../provide/category_goods_list.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CategoryPage extends StatefulWidget {
   @override
@@ -142,7 +144,7 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
     return Provide<ChildCategory>(
       builder: (context, child, childCategory) {
         return Container(
-          height: ScreenUtil().setHeight(70),
+          height: ScreenUtil().setHeight(75),
           width: ScreenUtil().setWidth(570),
           decoration: BoxDecoration(
               color: Colors.white,
@@ -213,6 +215,10 @@ class CategoryGoodsList extends StatefulWidget {
 }
 
 class _CategoryGoodsListState extends State<CategoryGoodsList> {
+  //上拉刷新所需key
+  GlobalKey<RefreshFooterState> _footerKey =
+      new GlobalKey<RefreshFooterState>();
+  var scrollController = new ScrollController();
   @override
   void initState() {
     super.initState();
@@ -222,17 +228,41 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   Widget build(BuildContext context) {
     return Provide<CategoryGoodsListProvide>(
       builder: (context, child, data) {
+        try {
+          if (Provide.value<ChildCategory>(context).page == 1) {
+            scrollController.jumpTo(0.0);
+          }
+        } catch (e) {
+          print('进入页面第一次初始化：${e}');
+        }
+
         if (data.goodsList.length > 0) {
           return Expanded(
             child: Container(
-              width: ScreenUtil().setWidth(570),
-              child: ListView.builder(
-                itemCount: data.goodsList.length,
-                itemBuilder: (context, index) {
-                  return _ListWidget(data.goodsList, index);
-                },
-              ),
-            ),
+                width: ScreenUtil().setWidth(570),
+                child: EasyRefresh(
+                  refreshFooter: ClassicsFooter(
+                      key: _footerKey,
+                      bgColor: Colors.white,
+                      textColor: Colors.pink,
+                      moreInfoColor: Colors.pink,
+                      showMore: true,
+                      noMoreText:
+                          Provide.value<ChildCategory>(context).noMoreText,
+                      moreInfo: '加载中',
+                      loadReadyText: '上拉加载'),
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: data.goodsList.length,
+                    itemBuilder: (context, index) {
+                      return _ListWidget(data.goodsList, index);
+                    },
+                  ),
+                  loadMore: () {
+                    //上拉加载更多
+                    _getMoreList();
+                  },
+                )),
           );
         } else {
           return Container(
@@ -245,6 +275,35 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
         }
       },
     );
+  }
+
+  //上拉加载更多的方法
+  void _getMoreList() {
+    Provide.value<ChildCategory>(context).addPage();
+    var data = {
+      'categoryId': Provide.value<ChildCategory>(context).categoryId,
+      'categorySubId': Provide.value<ChildCategory>(context).subId,
+      'page': Provide.value<ChildCategory>(context).page
+    };
+    request('getMallGoods', formData: data).then((val) {
+      var data = json.decode(val.toString());
+      CategoryGoodsListModel goodsList = CategoryGoodsListModel.fromJson(data);
+      if (goodsList.data == null) {
+        Fluttertoast.showToast(
+            msg: "已经到底了",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIos: 1,
+            backgroundColor: Colors.pink,
+            textColor: Colors.white,
+            fontSize: 16.0);
+
+        Provide.value<ChildCategory>(context).changeNoMore('没有更多了');
+      } else {
+        Provide.value<CategoryGoodsListProvide>(context)
+            .addGoodsList(goodsList.data);
+      }
+    });
   }
 
 //商品图片方法编写
