@@ -67,16 +67,15 @@ class _HomePageState extends State<HomePage>
                   (data['data']['floor3'] as List).cast(); //楼层1商品和图片
               return EasyRefresh(
                 refreshFooter: ClassicsFooter(
-                    key: _footerKey,
-                    bgColor: Colors.white,
-                    textColor: Colors.pink,
-                    moreInfoColor: Colors.pink,
-                    showMore: true,
-                    noMoreText: '',
-                    moreInfo: '加载中',
-                    loadReadyText: '上拉加载....',
-                    ),
-                  
+                  key: _footerKey,
+                  bgColor: Colors.white,
+                  textColor: Colors.pink,
+                  moreInfoColor: Colors.pink,
+                  showMore: true,
+                  noMoreText: '',
+                  moreInfo: '加载中',
+                  loadReadyText: '上拉加载....',
+                ),
                 child: ListView(
                   children: <Widget>[
                     SwiperDiy(swiperDataList: swiperDataList),
@@ -141,7 +140,8 @@ class _HomePageState extends State<HomePage>
       List<Widget> listWidget = hotGoodsList.map((val) {
         return InkWell(
             onTap: () {
-           Application.router.navigateTo(context,"/detail?id=${val['goodsId']}");
+              Application.router
+                  .navigateTo(context, "/detail?id=${val['goodsId']}");
             },
             child: Container(
               width: ScreenUtil().setWidth(372),
@@ -209,9 +209,15 @@ class SwiperDiy extends StatelessWidget {
       width: ScreenUtil().setWidth(750),
       child: Swiper(
         itemBuilder: (BuildContext context, int index) {
-          return Image.network(
-            "${swiperDataList[index]['image']}",
-            fit: BoxFit.cover,
+          return InkWell(
+            onTap: () {
+              Application.router.navigateTo(
+                  context, "/detail?id=${swiperDataList[index]['goodsId']}");
+            },
+            child: Image.network(
+              "${swiperDataList[index]['image']}",
+              fit: BoxFit.cover,
+            ),
           );
         },
         itemCount: swiperDataList.length,
@@ -346,16 +352,19 @@ class Recommend extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: recommendList.length,
         itemBuilder: (context, index) {
-          return _item(index);
+          return _item(context, index);
         },
       ),
     );
   }
 
   //3.推荐商品单独项编写
-  Widget _item(index) {
+  Widget _item(context, index) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Application.router.navigateTo(
+            context, "/detail?id=${recommendList[index]['goodsId']}");
+      },
       child: Container(
         height: ScreenUtil().setHeight(330),
         width: ScreenUtil().setWidth(250),
@@ -407,20 +416,20 @@ class FloorContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-        children: <Widget>[_firstRow(), _otherGoods()],
+        children: <Widget>[_firstRow(context), _otherGoods(context)],
       ),
     );
   }
 
 //第一块
-  Widget _firstRow() {
+  Widget _firstRow(context) {
     return Row(
       children: <Widget>[
-        _goodsItem(floorGoodsList[0]),
+        _goodsItem(context,floorGoodsList[0]),
         Column(
           children: <Widget>[
-            _goodsItem(floorGoodsList[1]),
-            _goodsItem(floorGoodsList[2]),
+            _goodsItem(context,floorGoodsList[1]),
+            _goodsItem(context,floorGoodsList[2]),
           ],
         )
       ],
@@ -428,44 +437,47 @@ class FloorContent extends StatelessWidget {
   }
 
 ////第二块
-  Widget _otherGoods() {
+  Widget _otherGoods(context) {
     return Row(
       children: <Widget>[
-        _goodsItem(floorGoodsList[3]),
-        _goodsItem(floorGoodsList[4]),
+        _goodsItem(context, floorGoodsList[3]),
+        _goodsItem(context, floorGoodsList[4]),
       ],
     );
   }
 
   //商品的子项，也算是这个类的最小模块了
-  Widget _goodsItem(Map goods_item) {
+  Widget _goodsItem(BuildContext context, Map goods_item) {
     return Container(
       width: ScreenUtil().setWidth(375),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Application.router
+              .navigateTo(context, "/detail?id=${goods_item['goodsId']}");
+        },
         child: Image.network(goods_item['image']),
       ),
     );
   }
 }
 
-//火爆专区
-class HotGoods extends StatefulWidget {
-  @override
-  _HotGoodsState createState() => _HotGoodsState();
-}
+// //火爆专区
+// class HotGoods extends StatefulWidget {
+//   @override
+//   _HotGoodsState createState() => _HotGoodsState();
+// }
 
-class _HotGoodsState extends State<HotGoods> {
-  @override
-  void initState() {
-    super.initState();
-    request('homePageBelowConten', formData: 1).then((val) {
-      print(val);
-    });
-  }
+// class _HotGoodsState extends State<HotGoods> {
+//   @override
+//   void initState() {
+//     super.initState();
+//     request('homePageBelowConten', formData: 1).then((val) {
+//       print(val);
+//     });
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container();
+//   }
+// }
