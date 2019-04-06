@@ -7,6 +7,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 //商品详情页的首屏区域，包括图片、商品名称，商品价格，商品编号的UI展示
 class DetailsTopArea extends StatelessWidget {
+
+
   @override
   Widget build(BuildContext context) {
     return Provide<DetailsInfoProvide>(

@@ -5,6 +5,20 @@ import 'dart:convert';
 
 class DetailsInfoProvide with ChangeNotifier {
   DetailsModel goodsInfo = null;
+  bool isLeft = true;
+  bool isRight = false;
+
+//tabbar的切换方法
+  changeLeftAndRight(String changeState) {
+    if (changeState == 'left') {
+      isLeft = true;
+      isRight = false;
+    } else {
+      isRight = true;
+      isLeft = false;
+    }
+     notifyListeners();
+  }
 
   getGoodsInfo(String id) {
     var formData = {
@@ -12,7 +26,7 @@ class DetailsInfoProvide with ChangeNotifier {
     };
     request('getGoodDetailById', formData: formData).then((val) {
       var responseData = json.decode(val.toString());
-   
+
       goodsInfo = DetailsModel.fromJson(responseData);
       notifyListeners();
     });
