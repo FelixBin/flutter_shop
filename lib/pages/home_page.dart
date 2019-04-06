@@ -436,7 +436,7 @@ class FloorContent extends StatelessWidget {
     );
   }
 
-////第二块
+//第二块
   Widget _otherGoods(context) {
     return Row(
       children: <Widget>[
@@ -460,24 +460,3 @@ class FloorContent extends StatelessWidget {
     );
   }
 }
-
-// //火爆专区
-// class HotGoods extends StatefulWidget {
-//   @override
-//   _HotGoodsState createState() => _HotGoodsState();
-// }
-
-// class _HotGoodsState extends State<HotGoods> {
-//   @override
-//   void initState() {
-//     super.initState();
-//     request('homePageBelowConten', formData: 1).then((val) {
-//       print(val);
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container();
-//   }
-// }
