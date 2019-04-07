@@ -17,14 +17,14 @@ class DetailsInfoProvide with ChangeNotifier {
       isRight = true;
       isLeft = false;
     }
-     notifyListeners();
+    notifyListeners();
   }
 
-  getGoodsInfo(String id) {
+  getGoodsInfo(String id) async {
     var formData = {
       'goodId': id,
     };
-    request('getGoodDetailById', formData: formData).then((val) {
+    await request('getGoodDetailById', formData: formData).then((val) {
       var responseData = json.decode(val.toString());
 
       goodsInfo = DetailsModel.fromJson(responseData);
