@@ -17,12 +17,14 @@ class DetailsContent extends StatelessWidget {
         var isLeft = Provide.value<DetailsInfoProvide>(context).isLeft;
         if (isLeft) {
           return Container(
+            margin: EdgeInsets.only(bottom: 40),
             child: Html(
               data: goodsDetails,
             ),
           );
         } else {
           return Container(
+            margin: EdgeInsets.only(bottom: 40),
             alignment: Alignment.center,
             width: ScreenUtil().setWidth(750),
             padding: EdgeInsets.all(10),
