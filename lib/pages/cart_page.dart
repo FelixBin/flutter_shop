@@ -1,75 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:provide/provide.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provide/provide.dart';
+import '../provide/cart.dart';
 
-class CartPage extends StatefulWidget {
-  @override
-  _CartPageState createState() => _CartPageState();
-}
-
-class _CartPageState extends State<CartPage> {
-  List<String> testlist = [];
-
+class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    _show();
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            height: 400.0,
-            child: ListView.builder(
-              itemCount: testlist.length,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('购物车'),
+      ),
+      body: FutureBuilder(
+        future: _getCartInfo(context),
+        builder: (context, snapshot) {
+          List cartList = Provide.value<CartProvide>(context).cartList;
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: cartList.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(testlist[index]),
-                );
+                return ListTile(title: Text(cartList[index].goodsName));
               },
-            ),
-          ),
-          RaisedButton(
-            onPressed: (){
-              _add();
-            },
-          child: Text('增加'),
-          ),
-          RaisedButton(
-            onPressed: (){
-              _clear();
-            },
-          child: Text('清空'),
-          )
-        ],
+            );
+          } else {
+            return Text('正在加载');
+          }
+        },
       ),
     );
   }
 
-  void _add() async {
-    SharedPreferences pres = await SharedPreferences.getInstance();
-    String temp = "你说的发送到你发了多少烦恼";
-    testlist.add(temp);
-    pres.setStringList("testlist", testlist);
-    _show();
-  }
-
-  void _show() async {
-    SharedPreferences pres = await SharedPreferences.getInstance();
-
-    if (pres.getStringList('testlist') != null) {
-      setState(() {
-        testlist = pres.getStringList('testlist');
-      });
-    }
-  }
-
-  void _clear() async {
-    SharedPreferences pres = await SharedPreferences.getInstance();
-
-    if (pres.getStringList('testlist') != null) {
-      pres.clear();
-      setState(() {
-        testlist = [];
-      });
-    }
+  Future<String> _getCartInfo(BuildContext context) async {
+    await Provide.value<CartProvide>(context).getCartInfo();
+    return 'end';
   }
 }
