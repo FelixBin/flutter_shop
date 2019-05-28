@@ -31,6 +31,9 @@ class CartProvide with ChangeNotifier {
     //用于进行循环的索引使用
     int ival = 0;
 
+     allPrice = 0;
+     allGoodsCount = 0; //把商品总数量设置为0
+
     //进行循环，找出是否已经存在该商品
     //如果存在，数量进行+1操作
     tempList.forEach((item) {
@@ -38,9 +41,12 @@ class CartProvide with ChangeNotifier {
         tempList[ival]['count'] = item['count'] + 1;
         cartList[ival].count++;
         isHave = true;
-      } else {
-        ival++;
       }
+        if (item['isCheck']) {
+          allPrice += (cartList[ival].price * cartList[ival].count);
+          allGoodsCount += cartList[ival].count;
+        }
+        ival++;
     });
 
 //  如果没有，进行增加
@@ -56,6 +62,8 @@ class CartProvide with ChangeNotifier {
 
       tempList.add(newGoods);
       cartList.add(new CartInfoModel.fromJson(newGoods));
+       allPrice += (count * price);
+       allGoodsCount += count;
     }
 
     //把字符串进行encode操作，
@@ -162,6 +170,31 @@ class CartProvide with ChangeNotifier {
     }
     cartString = json.encode(newList).toString(); //形成字符串
     prefs.setString('cartInfo', cartString); //进行持久化
+    await getCartInfo();
+  }
+
+//商品数量加减
+
+  addOrReduceAction(var cartItem, String todo) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    cartString = prefs.getString('cartInfo');
+    List<Map> tempList = (json.decode(cartString.toString()) as List).cast();
+    int tempIndex = 0;
+    int changeIndex = 0;
+    tempList.forEach((item) {
+      if (item['goodsId'] == cartItem.goodsId) {
+        changeIndex = tempIndex;
+      }
+      tempIndex++;
+    });
+    if (todo == 'add') {
+      cartItem.count++;
+    } else if (cartItem.count > 1) {
+      cartItem.count--;
+    }
+    tempList[changeIndex] = cartItem.toJson();
+    cartString = json.encode(tempList).toString();
+    prefs.setString('cartInfo', cartString);
     await getCartInfo();
   }
 }

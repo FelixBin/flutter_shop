@@ -9,20 +9,22 @@ import './routers/routes.dart';
 import './routers/application.dart';
 import './provide/details_info.dart';
 import './provide/cart.dart';
+import './provide/currentIndex.dart';
 
 void main() {
   var counter = Counter();
   var childCategory = ChildCategory();
   var categoryGoodsListProvide = CategoryGoodsListProvide();
   var detailsInfoProvide = DetailsInfoProvide();
+  var currentIndexProvide=CurrentIndexProvide();
   var cartProvide = CartProvide();
 
   var providers = Providers()
     ..provide(Provider<Counter>.value(counter))
     ..provide(Provider<ChildCategory>.value(childCategory))
     ..provide(Provider<DetailsInfoProvide>.value(detailsInfoProvide))
-    ..provide(
-        Provider<CategoryGoodsListProvide>.value(categoryGoodsListProvide))
+    ..provide(Provider<CategoryGoodsListProvide>.value(categoryGoodsListProvide))
+     ..provide(Provider<CurrentIndexProvide>.value(currentIndexProvide))
     ..provide(Provider<CartProvide>.value(cartProvide));
   runApp(ProviderNode(child: MyApp(), providers: providers));
 }

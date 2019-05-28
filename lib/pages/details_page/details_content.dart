@@ -19,7 +19,7 @@ class DetailsContent extends StatelessWidget {
           return Container(
             margin: EdgeInsets.only(bottom: 40),
             child: Html(
-              data: goodsDetails,
+              data: goodsDetails
             ),
           );
         } else {

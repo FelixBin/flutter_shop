@@ -36,7 +36,7 @@ class DetailsPage extends StatelessWidget {
                       DetailsTopArea(),
                       DetailsExplain(),
                       DetailsTabbar(),
-                      DetailsContent(),
+                     // DetailsContent(),
                     ],
                   ),
                 ),

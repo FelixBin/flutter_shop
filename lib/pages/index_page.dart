@@ -5,12 +5,10 @@ import 'category_page.dart';
 import 'cart_page.dart';
 import 'member_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provide/provide.dart';
+import '../provide/currentIndex.dart';
 
-class IndexPage extends StatefulWidget {
-  _IndexPageState createState() => _IndexPageState();
-}
-
-class _IndexPageState extends State<IndexPage> {
+class IndexPage extends StatelessWidget {
   //底部导航按钮
   final List<BottomNavigationBarItem> bottomTabs = [
     BottomNavigationBarItem(
@@ -32,39 +30,31 @@ class _IndexPageState extends State<IndexPage> {
     CartPage(),
     MemberPage()
   ];
-
-  int currentIndex = 0;
-  var currentPage;
-
-  @override
-  void initState() {
-    currentPage = tabBodies[currentIndex]; //默认首页
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)
       ..init(context); //初始化尺寸
-    return Scaffold(
-      backgroundColor: Color.fromRGBO(244, 245, 245, 1.0),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: currentIndex,
-        items: bottomTabs,
-        onTap: (index) {
-          //切换
-          setState(() {
-            //动态组件改变里面样式需要使用setState
-            currentIndex = index;
-            currentPage = tabBodies[currentIndex];
-          });
-        },
-      ),
-      body: IndexedStack(
-        index: currentIndex,
-        children: tabBodies,
-      ),
+
+    return Provide<CurrentIndexProvide>(
+      builder: (context, child, val) {
+        int currentIndex =
+            Provide.value<CurrentIndexProvide>(context).currentIndex;
+        return Scaffold(
+          backgroundColor: Color.fromRGBO(244, 245, 245, 1.0),
+          bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            currentIndex: currentIndex,
+            items: bottomTabs,
+            onTap: (index) {
+              Provide.value<CurrentIndexProvide>(context).changeIndex(index);
+            },
+          ),
+          body: IndexedStack(
+            index: currentIndex,
+            children: tabBodies,
+          ),
+        );
+      },
     );
   }
 }
